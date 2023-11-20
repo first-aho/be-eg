@@ -17,4 +17,5 @@ def config_app(app: Flask, base_url: str):
         engine = create_engine(os.environ["DATABASE_CONNECTION_STRING"])
         with engine.connect() as conn:
             books = conn.execute(text("select * from book")).all()
+            books = [{"name": book[0], "price": book[1]} for book in books]
             return jsonify(books)
