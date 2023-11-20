@@ -2,10 +2,17 @@ import os
 
 from flask import Flask, jsonify
 
-from sqlalchemy import create_engine
-from sqlalchemy.sql import text
+from sqlalchemy import create_engine, MetaData, Table, Column, String, Integer
+from sqlalchemy.sql import select
 
 def config_app(app: Flask, base_url: str):
+    metadata = MetaData()
+    books = Table("books", metadata,
+                  Column("name", String),
+                  Column("price", Integer))
+    engine = create_engine(os.environ["DATABASE_CONNECTION_STRING"])
+    metadata.create_all(engine)
+    
     app.config["BASE_URL"] = base_url
 
     @app.route("/")
@@ -14,8 +21,8 @@ def config_app(app: Flask, base_url: str):
 
     @app.route("/books")
     def get_books():
-        engine = create_engine(os.environ["DATABASE_CONNECTION_STRING"])
         with engine.connect() as conn:
-            books = conn.execute(text("select * from book")).all()
-            books = [{"name": book[0], "price": book[1]} for book in books]
+            s = select(books)
+            books = conn.execute(s).all()
+            books = [{"name": book.name, "price": book.price} for book in books]
             return jsonify(books)
