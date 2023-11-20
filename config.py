@@ -24,5 +24,5 @@ def config_app(app: Flask, base_url: str):
         with engine.connect() as conn:
             s = select(books)
             books = conn.execute(s).all()
-            books = [{"name": book.name, "price": book.price} for book in books]
+            books = [{"name": book._mapping.name, "price": book.mapping.price} for book in books]
             return jsonify(books)
