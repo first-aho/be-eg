@@ -7,7 +7,7 @@ from sqlalchemy.sql import select
 
 def config_app(app: Flask, base_url: str):
     metadata = MetaData()
-    books = Table("books", metadata,
+    books = Table("book", metadata,
                   Column("name", String),
                   Column("price", Integer))
     engine = create_engine(os.environ["DATABASE_CONNECTION_STRING"])
