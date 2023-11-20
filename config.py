@@ -22,6 +22,6 @@ def config_app(app: Flask, base_url: str):
     @app.route("/books")
     def get_books():
         with engine.connect() as conn:
-            books = conn.execute("select * from book").all()
+            books = conn.execute(text("select * from book")).all()
             books = [{"name": book[0], "price": book[1]} for book in books]
             return jsonify(books)
