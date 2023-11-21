@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 
 from sqlalchemy import create_engine, MetaData, Table, Column, String, Integer
 from sqlalchemy.sql import text
@@ -25,3 +25,21 @@ def config_app(app: Flask, base_url: str):
             books = conn.execute(text("select * from book")).all()
             books = [{"name": book[0], "price": book[1]} for book in books]
             return jsonify(books)
+
+    @app.route("/books/add", methods=["POST"])
+    def add_book():
+        with engine.connect() as conn:
+            data = request.json
+            name = data.get("name")
+            price = data.get("price")
+
+            if type(name) != str or type(price) != int:
+                return f"wrong type", 400
+
+            conn.execute(text(
+                f"insert into book(name, price) values "
+                f"('{name}', {price})"
+            ))
+            conn.commit()
+
+            return "success", 200
